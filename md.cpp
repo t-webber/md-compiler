@@ -13,22 +13,22 @@
 #define DIV 9
 #define BLOCKQUOTE 10
 
-// Missing: itemize and enumerate
 
 typedef struct {
   int header;
-  int listing;
+  int itemize;
   int spaces;
   int accent;
   int sharp;
+  char last_nb;
+  int enumerate;
   bool blockquote;
-  bool inlisting;
   bool lineChange;
   bool verbatim;
 } ReadingState;
 
 void printState(ReadingState* state) {
-  std::cout << "H = " << state->header << "; # = " << state->sharp
+  std::cout << "H = " << state->header << "; E = " << state->enumerate
             << "; ` = " << state->accent << "; V = " << state->verbatim
             << "  :   ";
 }
@@ -82,7 +82,7 @@ void addInit(std::ofstream* output) {
 }
 
 void addEnd(std::ofstream* output) {
-  *output << "</body>" << std::endl;
+  *output << "\n</body>" << std::endl;
   *output << "</html>" << std::endl;
 }
 
@@ -103,12 +103,11 @@ void writeDefaultChar(std::ofstream* output, char current,
       if (readState->header) {
         *output << "</h";
         *output << readState->header;
-        *output << ">";
+        *output << ">\n";
         readState->header = 0;
       }
       readState->lineChange = true;
       readState->spaces = 0;
-      *output << current;
       break;
     case ' ':
       if (readState->sharp && !readState->header) {
@@ -133,21 +132,33 @@ void endBlocQuote(std::ofstream* output, ReadingState* readState){
   }
 }
 
-void endLi(std::ofstream* output, ReadingState* readState){
-  if (readState->listing == 1) {
-    *output << "</li>" << std::endl;
-    readState->listing = 2;
-  }
-}
-
 
 void endUl(std::ofstream* output, ReadingState* readState){
-  if (readState->listing == 1) {
-    *output << "</ul>" << std::endl;
-    readState->listing = 2;
+  if (readState->itemize) {
+    *output << "</li>\n</ul>\n" << std::endl;
+    readState->itemize--;
   }
 }
 
+
+
+void endOl(std::ofstream* output, ReadingState* readState){
+  if (readState->last_nb != '!') {
+    readState->lineChange = false;
+    writeDefaultChar(output, readState->last_nb, readState);
+    readState->last_nb = '!';
+  }
+  if (readState->enumerate) {
+    std::cout << "closing...";
+    *output << "</ol>\n</ul>\n" << std::endl;
+    readState->enumerate--;
+  }
+}
+
+
+bool is_number(char c) {
+  return (c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7' || c == '8' || c == '9');
+}
 
 
 void writeCharOutput(std::ofstream* output, char current,
@@ -170,11 +181,11 @@ void writeCharOutput(std::ofstream* output, char current,
     }
   } else if (readState->lineChange) {
     std::cout << "N; ";
-    switch (current) {
+      switch (current) {
       case ' ':
         readState->spaces++;
         if (readState->sharp) {
-          *output << "<h" << readState->sharp << ">";
+          *output << "\n<h" << readState->sharp << ">";
           readState->header = readState->sharp;
           readState->sharp = 0;
           readState->lineChange = false;
@@ -182,34 +193,69 @@ void writeCharOutput(std::ofstream* output, char current,
           addChars(output, 3 - readState->accent, '`');
           readState->verbatim = !readState->verbatim;
           readState->accent = 0;
+        } else {
+          *output << current;
         }
         break;
       case '>':
+        endUl(output, readState);
+        endOl(output, readState);
+        *output << "\n";
         if (!readState->blockquote) {
-          *output << "<div class='blockquote'>\n";
+          *output << "\n<div class='blockquote'>";
         } 
           readState->blockquote = true;
           readState->lineChange = false;
           break;
-      case '-':
-        endBlocQuote(output, readState);
-        if (readState->listing == 0) {
-          *output << "<ul>\n\t<li>";
-          readState->listing = 1;
-        }
-      case '#':
-        endBlocQuote(output, readState);
+      case '.':
         endUl(output, readState);
+        endBlocQuote(output, readState);
+        if (readState->last_nb != '!') {
+          readState->last_nb = '!';
+          std::cout << "found OL ";
+          if (readState->enumerate) {
+            *output << "</ol>\n\t<ol>";
+          } else {
+            *output << "<ul>\n\t<ol>";
+            readState->enumerate++;
+          }
+          readState->lineChange = false;
+          break;
+        }
+      case '-':
+        std::cout << "found li; ";
+        endOl(output, readState);
+        endBlocQuote(output, readState);
+        if (!readState->itemize) {
+          *output << "\n<ul>\n\t<li>";
+          readState->itemize++;
+        } else {
+          *output << "</li>\n\t<li>";
+        }
+        readState->lineChange = false;
+        break;
+      case '#':
+        endUl(output, readState);
+        endOl(output, readState);
+        endBlocQuote(output, readState);
         readState->sharp++;
         break;
       case '`':
+        endUl(output, readState);
+        endOl(output, readState);
         endBlocQuote(output, readState);
         readState->accent++;
         break;
       default:
-        endBlocQuote(output, readState);
+        if (is_number(current)){
+          readState->last_nb = current;
+        } else {
+          endOl(output, readState);
+          endUl(output, readState);
+          endBlocQuote(output, readState);
           readState->lineChange = false;
           writeDefaultChar(output, current, readState);
+        }
         break;
     }
   } else {
@@ -255,27 +301,33 @@ void readNChange(std::ifstream* input, std::ofstream* output) {
 
   ReadingState readState;
   readState.header = 0;
-  readState.listing = 0;
+  readState.itemize = 0;
+  readState.enumerate = 0;
   readState.spaces = 0;
   readState.accent = 0;
   readState.sharp = 0;
+  readState.last_nb = '!';
   readState.blockquote = false;
-  readState.inlisting = false;
   readState.lineChange = true;
   readState.verbatim = false;
 
   while ((*input).good()) {
     char current = (*input).get();
+    if (current == EOF) {
+      break;
+    }
     bool current_is_accent = (current == '`');
     if (!current_is_accent) {
       writeCharOutput(output, current, &readState);
     }
     checkVerbatim(output, &readState, current_is_accent);
   }
-
-  writeCharOutput(output, ' ', &readState);
+ 
+  // writeCharOutput(output, ' ', &readState);
   checkVerbatim(output, &readState, false);
   endBlocQuote(output, &readState);
+  endUl(output, &readState);
+  endOl(output, &readState);
   addEnd(output);
 }
 
@@ -298,5 +350,9 @@ int main(int argc, char** argv) {
   std::cout << "Starting..." << std::endl;
 
   readNChange(&input, &output);
+  
+  input.close();
+  output.close();
+
   return 0;
 }
