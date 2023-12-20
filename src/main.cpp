@@ -49,6 +49,7 @@ void readNChange(std::ifstream* input, std::ofstream* output) {
   readState.spaces = 0;
   readState.accent = 0;
   readState.sharp = 0;
+  readState.start_was_char = true;
   readState.last_nb = '!';
   readState.blockquote = false;
   readState.lineChange = true;

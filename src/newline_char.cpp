@@ -13,6 +13,7 @@ void endOfSuccessive(std::ofstream* output, ReadingState* readState, char curren
    readState->header = readState->sharp;
    readState->sharp = 0;
    readState->lineChange = false;
+   readState->start_was_char = std::isalpha(current);
  } else if (readState->accent) {
    addChars(output, 3 - readState->accent, '`');
    readState->verbatim = !readState->verbatim;
@@ -37,12 +38,13 @@ void endUl(std::ofstream* output, ReadingState* readState){
 void endOl(std::ofstream* output, ReadingState* readState){
   if (readState->last_nb != '!') {
     readState->lineChange = false;
+    readState->start_was_char = false;
     writeDefaultChar(output, readState->last_nb, readState);
     readState->last_nb = '!';
   }
   if (readState->enumerate) {
     std::cout << "closing...";
-    *output << "</ol>\n</ul>\n" << std::endl;
+    *output << "</li>\n</ol>\n" << std::endl;
     readState->enumerate--;
   }
 }
@@ -60,6 +62,7 @@ void writeNewlineChar(std::ofstream* output, char current,
         } 
           readState->blockquote = true;
           readState->lineChange = false;
+          readState->start_was_char = std::isalpha(current);
           break;
       case '.':
         endUl(output, readState);
@@ -68,12 +71,13 @@ void writeNewlineChar(std::ofstream* output, char current,
           readState->last_nb = '!';
           std::cout << "found OL ";
           if (readState->enumerate) {
-            *output << "</ol>\n\t<ol>";
+            *output << "</li>\n\t<li>";
           } else {
-            *output << "<ul>\n\t<ol>";
+            *output << "<ol>\n\t<li>";
             readState->enumerate++;
           }
           readState->lineChange = false;
+          readState->start_was_char = std::isalpha(current);
           break;
         }
       case '-':
@@ -87,6 +91,7 @@ void writeNewlineChar(std::ofstream* output, char current,
           *output << "</li>\n\t<li>";
         }
         readState->lineChange = false;
+        readState->start_was_char = std::isalpha(current);
         break;
       case '#':
         endUl(output, readState);
@@ -111,8 +116,8 @@ void writeNewlineChar(std::ofstream* output, char current,
           endOl(output, readState);
           endUl(output, readState);
           endBlocQuote(output, readState);
-          *output << "<br>";
           readState->lineChange = false;
+          readState->start_was_char = std::isalpha(current);
           writeDefaultChar(output, current, readState);
         }
         break;

@@ -69,6 +69,9 @@ void writeDefaultChar(std::ofstream* output, char current,
         *output << ">\n";
         readState->header = 0;
       }
+      if (readState->start_was_char) {
+        *output << "<br>";
+      }
       readState->lineChange = true;
       readState->spaces = 0;
       break;
