@@ -1,5 +1,6 @@
 #ifndef TYPE_HPP
 #define TYPE_HPP
+#include <iostream>
 
 struct ReadingState {
   int header;
@@ -15,5 +16,9 @@ struct ReadingState {
 };
 
 typedef ReadingState ReadingState;
+
+void printState(ReadingState* state);
+
+bool is_number(char c);
 
 #endif
