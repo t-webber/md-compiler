@@ -9,7 +9,7 @@
       font-size: 14px;
       line-height: 1.6;
     }
-    .blockquote {
+    .blockquote, .blockpre {
       border-left: 3px solid #ccc;
       margin-left: 0;
       margin: 1em;
@@ -17,9 +17,17 @@
       padding-left: 1em;
       background-color: #eee;
     }
+    .inline-pre {
+      display: inline-block;
+    }
   </style>
 </head>
 <body>
-aa`zz``e<br>e<pre>rr`tt</pre>`yy`uu``iopqsdfghjk<br><br>lmwxcvbn 
+aa<pre class='inline-pre'>zz</pre>`e<br><br><br>e<pre class='blockpre'>rrtt</pre>yy<pre class='inline-pre'>uu</pre>`iopqsdfghjk<br><br>
+<div class='blockquote'>
+ lmwxcvbn<br></div>
+
+<br>
+<span style='font-family:serif;font-weight:bold;font-size:small;'>All rights reserved. &copy; 2024</span>
 </body>
 </html>

@@ -13,6 +13,7 @@ struct ReadingState {
   bool blockquote;
   bool lineChange;
   bool verbatim; 
+  bool inline_verbatim;
   bool start_was_char;
 };
 

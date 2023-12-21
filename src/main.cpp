@@ -54,6 +54,7 @@ void readNChange(std::ifstream* input, std::ofstream* output) {
   readState.blockquote = false;
   readState.lineChange = true;
   readState.verbatim = false;
+  readState.inline_verbatim = false;
 
   bool current_is_accent;
 

@@ -7,25 +7,27 @@
 
 
 void checkVerbatim(std::ofstream* output, ReadingState* readState, bool is_accent) {
-  if (!readState->accent) {
+  if (!readState->accent || is_accent) {
     return;
   }
 
-  if (readState->accent < 3 and !is_accent) {
-    addChars(output, readState->accent, '`');
-    std::cout << "writing " << readState->accent << " accents";
+  if (readState->accent < 3 && !readState->verbatim) {
+    if (!readState->inline_verbatim) {
+      *output << "<pre class='inline-pre'>";
+    } else {
+      *output << "</pre>";  
+    }
+    readState->inline_verbatim = !readState->inline_verbatim;
+    addChars(output, readState->accent-1, '`');
     readState->accent = 0;
     return;
   } else if (readState->accent < 3) {
-    std::cout << "not enough";
     return;
   } else {
-    if (readState->verbatim) {
+   if (readState->verbatim) {
       *output << "</pre>";
-      std::cout << "EndPreview" << std::endl;
     } else {
-      *output << "<pre>";
-      std::cout << "BeginPreview" << std::endl;
+      *output << "<pre class='blockpre'>";
     }
     readState->verbatim = !readState->verbatim;
     readState->accent = 0;

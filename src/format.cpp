@@ -53,7 +53,7 @@ void addInit(std::ofstream* output) {
   "      font-size: 14px;\n"
   "      line-height: 1.6;\n"
   "    }\n"
-  "    .blockquote {\n"
+  "    .blockquote, .blockpre {\n"
   "      border-left: 3px solid #ccc;\n"
   "      margin-left: 0;\n"
   "      margin: 1em;\n"
@@ -61,12 +61,18 @@ void addInit(std::ofstream* output) {
   "      padding-left: 1em;\n"
   "      background-color: #eee;\n"
   "    }\n"
+  "    .inline-pre {\n"
+  "      display: inline-block;\n"
+  "    }\n"
   "  </style>\n"
   "</head>\n"
   "<body>\n";
 }
 
 void addEnd(std::ofstream* output) {
-  *output << "\n</body>" << std::endl;
-  *output << "</html>" << std::endl;
+  *output << std::endl <<
+  "<br>\n"
+  "<span style='font-family:serif;font-weight:bold;font-size:small;'>All rights reserved. &copy; 2024</span>\n"
+  "</body>\n"
+  "</html>\n";
 }
