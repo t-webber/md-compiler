@@ -14,11 +14,6 @@ void endOfSuccessive(std::ofstream* output, ReadingState* readState, char curren
    readState->sharp = 0;
    readState->lineChange = false;
    readState->start_was_char = false;
- } else if (readState->accent) {
-   addChars(output, 3 - readState->accent, '`');
-   readState->start_was_char = false;
-   readState->verbatim = !readState->verbatim;
-   readState->accent = 0;
  }
 }
 
@@ -55,8 +50,16 @@ void endOl(std::ofstream* output, ReadingState* readState){
 
 void writeNewlineChar(std::ofstream* output, char current,
                       ReadingState* readState) {
-    std::cout << "N; ";
+    std::cout << "N; with " << current;
       switch (current) {
+      case '`':
+        std::cout << "increment accent";
+        endUl(output, readState);
+        endOl(output, readState);
+        endBlocQuote(output, readState);
+        readState->start_was_char = false;
+        readState->accent++;
+        break;
       case '>':
         endUl(output, readState);
         endOl(output, readState);
@@ -104,13 +107,6 @@ void writeNewlineChar(std::ofstream* output, char current,
         readState->start_was_char = false;
         readState->sharp++;
         break;
-      case '`':
-        endUl(output, readState);
-        endOl(output, readState);
-        endBlocQuote(output, readState);
-        readState->start_was_char = false;
-        readState->accent++;
-        break;
       case ' ':
         readState->spaces++;
         readState->start_was_char = false;
@@ -118,7 +114,6 @@ void writeNewlineChar(std::ofstream* output, char current,
       case '\n':
         readState->spaces = 0;
         readState->sharp = 0;
-        readState->accent = 0;
         break;
       default:
         endOfSuccessive(output, readState, current);

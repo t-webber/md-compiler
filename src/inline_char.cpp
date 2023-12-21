@@ -7,23 +7,17 @@
 
 
 void checkVerbatim(std::ofstream* output, ReadingState* readState, bool is_accent) {
-//   if (!is_accent){
-//     if (readState->accent >= 3) {
-//       std::cerr << "that's weird";
-//     }
-//     addChars(output, readState->accent, '`');
-//     readState->accent = 0;
-//     return;
-//   } else {
-//     readState->accent++;
-//   }
-
-  if (readState->accent > 3) {
-    addChars(output, readState->accent - 3, '`');
-    readState->accent = 3;
+  if (!readState->accent) {
+    return;
   }
 
-  if (readState->accent < 3) {
+  if (readState->accent < 3 and !is_accent) {
+    addChars(output, readState->accent, '`');
+    std::cout << "writing " << readState->accent << " accents";
+    readState->accent = 0;
+    return;
+  } else if (readState->accent < 3) {
+    std::cout << "not enough";
     return;
   } else {
     if (readState->verbatim) {

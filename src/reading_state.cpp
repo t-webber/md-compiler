@@ -2,8 +2,7 @@
 #include <iostream>
 
 void printState(ReadingState* state) {
-  std::cout << "H = " << state->header << "; E = " << state->enumerate
-            << "; ` = " << state->accent << "; V = " << state->verbatim
+  std::cout << "` = " << state->accent << "; V = " << state->verbatim
             << "  :   ";
 }
 

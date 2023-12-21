@@ -5,5 +5,4 @@ do
     clear
     xmake
     ./md2html
-    sleep 10
 done
