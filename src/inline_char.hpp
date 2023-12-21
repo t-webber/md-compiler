@@ -15,5 +15,4 @@ void writeVerbatimChar(std::ofstream* output, char current,
 void writeDefaultChar(std::ofstream* output, char current,
                       ReadingState* readState);
 
-
 void addChars(std::ofstream* output, int number, char value);

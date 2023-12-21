@@ -1,4 +1,0 @@
-#!/usr/bin/bash
-clear
-xmake
-./build/linux/x86_64/release/mdCompiler "examples/file.md"

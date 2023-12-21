@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+
+while [[ "a" = "a" ]]
+do
+    clear
+    xmake
+    ./md2html
+    sleep 10
+done
