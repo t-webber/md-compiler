@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string>
 
+using namespace std;
+
 void checkExtension(char* filename) {
   char* current = filename;
   while (*current && *current != '.') {
@@ -40,39 +42,20 @@ void makeOutputPath(char* outputPath, char* filename) {
   *(++writing) = '\0';
 }
 
-void addInit(std::ofstream* output) {
-  *output << 
-  "<!DOCTYPE html>\n"
-  "<html lang='en'>\n"
-  "<head>\n"
-  "  <meta charset='UTF-8'>\n"
-  "  <meta name='viewport' content='width=device-width, initial-scale=1.0'>\n"
-  "  <style>\n"
-  "    body {\n"
-  "      font-family: sans-serif;\n"
-  "      font-size: 14px;\n"
-  "      line-height: 1.6;\n"
-  "    }\n"
-  "    .blockquote, .blockpre {\n"
-  "      border-left: 3px solid #ccc;\n"
-  "      margin-left: 0;\n"
-  "      margin: 1em;\n"
-  "      padding: 0.5em;\n"
-  "      padding-left: 1em;\n"
-  "      background-color: #eee;\n"
-  "    }\n"
-  "    .inline-pre {\n"
-  "      display: inline-block;\n"
-  "    }\n"
-  "  </style>\n"
-  "</head>\n"
-  "<body>\n";
+void copyFile(std::ofstream* output, std::string path){
+  std::ifstream input;
+  input.open(path); 
+  std::string content;
+  while (std::getline(input, content)){;
+    *output << content << std::endl;
+  }
 }
 
+void addInit(std::ofstream* output) {
+  copyFile(output, "./src/html_templates/header.html");
+}
+
+
 void addEnd(std::ofstream* output) {
-  *output << std::endl <<
-  "<br>\n"
-  "<span style='font-family:serif;font-weight:bold;font-size:small;'>All rights reserved. &copy; 2024</span>\n"
-  "</body>\n"
-  "</html>\n";
+  copyFile(output, "./src/html_templates/footer.html");
 }

@@ -2,8 +2,8 @@
 #include <iostream>
 
 void printState(ReadingState* state) {
-  std::cout << "` = " << state->accent << "; V = " << state->verbatim
-            << "  :   ";
+  // std::cout << "` = " << state->accent << "; V = " << state->verbatim
+  //           << ":  ";
 }
 
 bool is_number(char c) {

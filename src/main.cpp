@@ -28,8 +28,6 @@ int main(int argc, char** argv) {
   input.open(argv[1]);
   output.open(outputPath);
 
-  std::cout << "Starting..." << std::endl;
-
   readNChange(&input, &output);
   
   input.close();
@@ -80,8 +78,8 @@ void readNChange(std::ifstream* input, std::ofstream* output) {
 
 void writeCharOutput(std::ofstream* output, char current,
                      ReadingState* readState) {
+  std::cout << "C = " << current << " (" << int(current) << ") " << "; ";
   printState(readState);
-  std::cout << "C = " << current << "; ";
   if (readState->verbatim) {
     writeVerbatimChar(output, current, readState);
   } else if (readState->lineChange) {
@@ -89,5 +87,5 @@ void writeCharOutput(std::ofstream* output, char current,
   } else {
     writeDefaultChar(output, current, readState);
   }
-  std::cout << "!" << std::endl;
+  std::cout << "endl" << std::endl;
 }

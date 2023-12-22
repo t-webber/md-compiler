@@ -1,0 +1,4 @@
+while [[ -z $1 ]] ;
+do 
+git push 
+done

@@ -59,16 +59,15 @@ void writeDefaultChar(std::ofstream* output, char current,
       readState->accent++;
       break;
     case '\n':
+      
+        std::cout << "found newlineinline !!! ";
       if (readState->header) {
         *output << "</h";
         *output << readState->header;
-        *output << ">\n";
+        *output << ">" << std::endl;
         readState->header = 0;
       }
-      if (readState->start_was_char) {
-        *output << "<br>";
-      }
-        readState->start_was_char = true;
+      // readState->start_was_char = true;
       readState->lineChange = true;
       readState->spaces = 0;
       break;
@@ -76,7 +75,7 @@ void writeDefaultChar(std::ofstream* output, char current,
       if (readState->sharp && !readState->header) {
         readState->header = readState->sharp;
         // *output << "<h1> ";
-        std::cout << std::endl << " ===== What ? ===== " << std::endl;
+        std::cerr << std::endl << " ===== What ? ===== " << std::endl;
       } else {
         *output << current;
       }
