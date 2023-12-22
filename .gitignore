@@ -2,6 +2,7 @@
 # .vscode
 # .xmake
 build
+try
 # examples
 # tests
 # run

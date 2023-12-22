@@ -3,13 +3,10 @@
 #include <iostream>
 #include <list>
 
-
-
-
 struct TagState {
   std::string tag;
-  bool readingOpenTagName;
-  bool readingCloseTagName;
+  bool readingTagName;
+  bool closeTag;
   std::list<std::string> openedTags;
 };
 typedef TagState TagState;
@@ -31,7 +28,7 @@ struct ReadingState {
   bool star;
   bool bold;
   bool italic;
-  TagState tagState;
+  TagState* tagState;
 };
 typedef ReadingState ReadingState;
 

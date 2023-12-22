@@ -109,7 +109,7 @@ void writeNewlineChar(std::ofstream* output, char current,
             
             break;
         case '\n':
-            std::cout << "found newline !!!!!!!!!!!!!!!!!!!!";
+            // std::cout << "found newline !!!!!!!!!!!!!!!!!!!!";
             *output << "<br>";
             readState->spaces = 0;
             readState->sharp = 0;

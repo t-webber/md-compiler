@@ -2,6 +2,7 @@
 #include "inline_char.hpp"
 #include "reading_state.hpp"
 #include "format.hpp"
+#include "tags_char.hpp"
 
 
 #include <fstream>
@@ -70,7 +71,9 @@ void writeCharOutput(std::ofstream* output, char current,
                      ReadingState* readState) {
   std::cout << "C = " << current << "; ";
   printState(readState);
-  if (readState->verbatim) {
+  if (current == '<' || readState->tagState->openedTags.size() > 0 || readState->tagState->readingTagName) {
+    writeTagsChar(output, current, readState);
+  } else if (readState->verbatim) {
     writeVerbatimChar(output, current, readState);
   } else if (readState->lineChange) {
     writeNewlineChar(output, current, readState);

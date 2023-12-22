@@ -3,8 +3,7 @@
 #include <list>
 
 void printState(ReadingState* state) {
-  std::cout << "* = " << state->star << "; B = " << state->bold << "; I = "
-            << state->italic << "; ";
+  std::cout << "rdg : " << state->tagState->readingTagName << "; close : " << state->tagState->closeTag << "; acc = " << state->tagState->tag << " ! ";
 }
 
 void initState(ReadingState* state, TagState* tag) {
@@ -22,10 +21,11 @@ void initState(ReadingState* state, TagState* tag) {
   state->star = false;
   state->bold = false;
   state->italic = false;
+  state->tagState = tag;
   
   tag->tag = "";
-  tag->readingOpenTagName = false;
-  tag->readingCloseTagName = false;
+  tag->readingTagName = false;
+  tag->closeTag = false;
   tag->openedTags = {};
 }
 

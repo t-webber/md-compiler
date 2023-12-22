@@ -52,11 +52,11 @@ void writeVerbatimChar(std::ofstream *output, char current,
     }
 }
 
-void endStar(std::ofstream* output, ReadingState* readState){
-    if (readState->star && readState->italic){
+void endStar(std::ofstream *output, ReadingState *readState) {
+    if (readState->star && readState->italic) {
         *output << "</em>";
         readState->italic = false;
-    } else if (readState->star){
+    } else if (readState->star) {
         *output << "<em>";
         readState->italic = true;
     };
@@ -64,7 +64,7 @@ void endStar(std::ofstream* output, ReadingState* readState){
 }
 
 void writeDefaultChar(std::ofstream *output, char current,
-                      ReadingState *readState) { 
+                      ReadingState *readState) {
     std::cout << "D; ";
     if (current != '*') {
         endStar(output, readState);
@@ -72,10 +72,10 @@ void writeDefaultChar(std::ofstream *output, char current,
     switch (current) {
         case '`':
             readState->accent++;
-            
+
             break;
         case '\n':
-            std::cout << "found newlineinline !!! ";
+            // std::cout << "found newlineinline !!! ";
             if (readState->header) {
                 *output << "</h";
                 *output << readState->header;
@@ -84,7 +84,7 @@ void writeDefaultChar(std::ofstream *output, char current,
             }
             readState->lineChange = true;
             readState->spaces = 0;
-            
+
             break;
         case ' ':
             if (readState->sharp && !readState->header) {
@@ -94,26 +94,25 @@ void writeDefaultChar(std::ofstream *output, char current,
             } else {
                 *output << current;
             }
-            
             break;
         case '*':
-        std::cout << "found star ";
-            if (readState->star && readState->bold){
+            std::cout << "found star ";
+            if (readState->star && readState->bold) {
                 *output << "</b>";
                 readState->bold = false;
-               readState->star = false;
-            } else if (readState->star){
+                readState->star = false;
+            } else if (readState->star) {
                 *output << "<b>";
                 readState->bold = true;
-               readState->star = false;
+                readState->star = false;
             } else {
                 std::cout << "first star ";
-               readState->star = true;
-               std::cout << readState->star;
+                readState->star = true;
+                std::cout << readState->star;
             };
             break;
         default:
-                *output << current;
+            *output << current;
             break;
     }
 }
