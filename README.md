@@ -1,7 +1,7 @@
 # Markdown Compiler
 
-Converts a `.md` file to an `.html` file.
+Converts a `.md` file to a `.html` file.
 
-> Usage : `./md2html <file>.md`
+> Usage: `./tools/md2html <file>.md`
 >
-> Output : `<file>.html`, in the same directory than `file.md`.
+> Output: `<file>.html`, in the same directory than `<file>.md`.

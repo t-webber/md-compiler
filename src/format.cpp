@@ -31,7 +31,7 @@ void makeOutputPath(char* outputPath, char* filename) {
     writing++;
   }
   if (!(*current)) {
-    std::cerr << "Problem creating file" << std::endl;
+    std::cerr << "Problem occured while creating the output file path." << std::endl;
     exit(2);
   }
   *writing = '.';

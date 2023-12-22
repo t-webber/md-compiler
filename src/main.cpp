@@ -41,18 +41,8 @@ void readNChange(std::ifstream* input, std::ofstream* output) {
   addInit(output);
 
   ReadingState readState;
-  readState.header = 0;
-  readState.itemize = 0;
-  readState.enumerate = 0;
-  readState.spaces = 0;
-  readState.accent = 0;
-  readState.sharp = 0;
-  readState.start_was_char = true;
-  readState.last_nb = '!';
-  readState.blockquote = false;
-  readState.lineChange = true;
-  readState.verbatim = false;
-  readState.inline_verbatim = false;
+  TagState tagState;
+  initState(&readState, &tagState);
 
   bool current_is_accent;
 
@@ -78,7 +68,7 @@ void readNChange(std::ifstream* input, std::ofstream* output) {
 
 void writeCharOutput(std::ofstream* output, char current,
                      ReadingState* readState) {
-  std::cout << "C = " << current << " (" << int(current) << ") " << "; ";
+  std::cout << "C = " << current << "; ";
   printState(readState);
   if (readState->verbatim) {
     writeVerbatimChar(output, current, readState);

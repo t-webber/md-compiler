@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        .red-punctuation {
+            color: red;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var text = $('pre').html();
+            var newText = text.replace(/(?![^<]+>)([.,\/#!$%\^&\*;:{}=\-_`~()])/g,"<span class='pre-punctuation'>$1</span>");
+            $('pre').html(newText);
+        });
+    </script>
+</head>
+<body>
+    Some cv;fgermizfsjdpouehç"é_'yzhfeôsd
+
+    <pre>
+        Some, punctuation! #a and &b.
+    </pre>
+</body>
+</html>

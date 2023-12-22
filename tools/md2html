@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 if [[ -z $1 ]]
 then
-name="examples/file.md"
+name="test/file.md"
 else
 name=$1
 fi

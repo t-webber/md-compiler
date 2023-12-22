@@ -1,5 +1,8 @@
-.vscode
-.xmake
+# .editorconfig
+# .vscode
+# .xmake
 build
 # examples
-# inf
+# tests
+# run
+.*
