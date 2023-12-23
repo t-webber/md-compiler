@@ -2,6 +2,7 @@
 #define TYPE_HPP
 #include <iostream>
 #include <list>
+#include <string>
 
 struct TagState {
   std::string tag;
@@ -28,6 +29,7 @@ struct ReadingState {
   bool star;
   bool bold;
   bool italic;
+  std::string lang;
   TagState* tagState;
 };
 typedef ReadingState ReadingState;

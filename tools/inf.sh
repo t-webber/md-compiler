@@ -4,5 +4,5 @@ while [[ "a" = "a" ]]
 do
     clear
     xmake
-    ./tools/md2html
+    ./tools/md2html.sh
 done

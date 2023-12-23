@@ -6,13 +6,27 @@
 
 #include "reading_state.hpp"
 
-void checkVerbatim(std::ofstream *output, ReadingState *readState,
+std::string readLanguage(std::ifstream* input, ReadingState* readState){
+    std::string lang = "";
+    char current = (*input).get();
+    while (current != '\n' && int(current) != 13 && current != EOF) {
+        lang += current;
+        current = (*input).get();
+    };
+    if (current == EOF) {
+        std::cerr << "Error: no newline after language declaration" << std::endl;
+        exit(4);
+    };
+    return lang;
+}
+
+void checkVerbatim(std::ofstream *output, std::ifstream* input, ReadingState *readState,
                    bool is_accent) {
     if (!readState->accent || is_accent) {
         return;
     }
 
-    if (readState->accent < 3 && !readState->verbatim) {
+    if (readState->accent < 3 && !readState->verbatim && !is_accent) {
         if (!readState->inline_verbatim) {
             *output << "<pre class='pre-inline'>";
         } else {
@@ -28,7 +42,8 @@ void checkVerbatim(std::ofstream *output, ReadingState *readState,
         if (readState->verbatim) {
             *output << "</pre>";
         } else {
-            *output << "<pre class='pre-block'>" << std::endl;
+            std::string lang = readLanguage(input, readState);
+            *output << "<pre class='pre-block " << lang << "'>" << std::endl;
         }
         readState->verbatim = !readState->verbatim;
         readState->accent = 0;

@@ -54,12 +54,12 @@ void readNChange(std::ifstream* input, std::ofstream* output) {
     }
 
     current_is_accent = (current == '`');
-    checkVerbatim(output, &readState, current_is_accent);
+    checkVerbatim(output, input, &readState, current_is_accent);
     writeCharOutput(output, current, &readState);
   }
  
   writeCharOutput(output, ' ', &readState);
-  checkVerbatim(output, &readState, false);
+  checkVerbatim(output, input, &readState, false);
   endBlocQuote(output, &readState);
   endUl(output, &readState);
   endOl(output, &readState);

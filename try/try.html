@@ -1,26 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
-        .red-punctuation {
-            color: red;
-        }
-    </style>
+      body {
+        font-family: sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+        background: #333;
+        color: white;
+      }
+      .blockquote,
+      .pre-block {
+        margin: 1em;
+        padding: 0.5em;
+        background-color: #777;
+        /* color: #333; */
+      }
+      .blockquote {
+        border-left: 3px solid #777;
+        margin-left: 0;
+        padding-left: 1em;
+      }
+      .pre-block {
+        border: 1px solid #333;
+        color: rgb(17, 83, 136);
+      }
+      .pre-inline {
+        display: inline-block;
+      }
+      .pre-punctuation {
+        color: rgb(223, 176, 23);
+      }
+      .pre-number {
+        color: rgb(9, 109, 26);
+      }
+      .pre-keyword {
+        color: rgb(126, 40, 126);
+      }
+      .pre-string {
+        color: rgb(143, 58, 25);
+      }
+    </style> 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        $(document).ready(function() {
-            var text = $('pre').html();
-            var newText = text.replace(/(?![^<]+>)([.,\/#!$%\^&\*;:{}=\-_`~()])/g,"<span class='pre-punctuation'>$1</span>");
-            $('pre').html(newText);
-        });
-    </script>
-</head>
-<body>
-    Some cv;fgermizfsjdpouehç"é_'yzhfeôsd
+      const KEYWORDS = {
+        c: ['include', 'defined', 'define', 'ifdef', 'ifndef', 'undef', 'endif', 'auto', 'break', 'case', 'char', 'const', 'continue', 'default', 'do', 'double', 'else', 'enum', 'extern', 'float', 'for', 'goto', 'if', 'inline', 'int', 'long', 'register', 'restrict', 'return', 'short', 'signed', 'sizeof', 'static', 'struct', 'switch', 'typedef', 'union', 'unsigned', 'void', 'volatile', 'while', '_Alignas', '_Alignof', '_Atomic', '_Bool', '_Complex', '_Generic', '_Imaginary', '_Noreturn', '_Static_assert', '_Thread_local'],
+        caml: ['and', 'as', 'assert', 'asr', 'begin', 'class', 'constraint', 'do', 'done', 'downto', 'else', 'end', 'exception', 'external', 'false', 'for', 'fun', 'function', 'functor', 'if', 'in', 'include', 'inherit', 'initializer', 'land', 'lazy', 'let', 'lor', 'lsl', 'lsr', 'lxor', 'match', 'method', 'mod', 'module', 'mutable', 'new', 'nonrec', 'object', 'of', 'open', 'or', 'private', 'rec', 'sig', 'struct', 'then', 'to', 'true', 'try', 'type', 'val', 'virtual', 'when', 'while', 'with'],
+        ccs: [ "abstract",	"as", "base", "bool", "break",	"byte", "case", "catch", "char",	"checked", "class", "const", "continue",	"decimal", "default", "delegate", "do",	"double", "else", "enum", "event",	"explicit", "extern", "false", "finally",	"fixed", "float", "for", "foreach",	"goto", "if", "implicit", "in",	"int", "interface", "internal", "is",	"lock", "long", "namespace", "new",	"null", "object", "operator", "out",	"override", "params", "private", "protected",	"public", "readonly", "ref", "return",	"sbyte", "sealed", "short", "sizeof",	"stackalloc", "static", "string", "struct",	"switch", "this", "throw", "true",	"try", "typeof", "uint", "ulong",	"unchecked", "unsafe", "ushort", "using",	"virtual", "void", "volatile", "while",	"add", "alias", "ascending", "async",	"await", "by", "descending", "dynamic",	"equals", "from", "get", "global",	"group", "into", "join", "let",	"nameof", "notnull", "on", "orderby",	"partial", "remove", "select", "set",	"unmanaged", "value", "var", "when",	"where", "yield"],
+        cpp: ['include', 'defined', 'define', 'ifdef', 'ifndef', 'undef', 'endif', 'alignas', 'alignof', 'asm', 'auto', 'bool', 'break', 'case', 'catch', 'char', 'char8_t', 'char16_t', 'char32_t', 'class', 'concept', 'const', 'consteval', 'constexpr', 'constinit', 'const_cast', 'continue', 'co_await', 'co_return', 'co_yield', 'decltype', 'default', 'delete', 'do', 'double', 'dynamic_cast', 'else', 'enum', 'explicit', 'export', 'extern', 'false', 'float', 'for', 'friend', 'goto', 'if', 'inline', 'int', 'long', 'mutable', 'namespace', 'new', 'noexcept', 'nullptr', 'operator', 'private', 'protected', 'public', 'register', 'reinterpret_cast', 'requires', 'return', 'short', 'signed', 'sizeof', 'static', 'static_assert', 'static_cast', 'struct', 'switch', 'template', 'this', 'thread_local', 'throw', 'true', 'try', 'typedef', 'typeid', 'typename', 'union', 'unsigned', 'using', 'virtual', 'void', 'volatile', 'wchar_t', 'while', 'and', 'and_eq', 'bitand', 'bitor', 'compl', 'not', 'not_eq', 'or', 'or_eq', 'xor', 'xor_eq'],
+        dart: ['assert', 'break', 'case', 'catch', 'class', 'const', 'continue', 'default', 'do', 'else', 'enum', 'extends', 'false', 'final', 'finally', 'for', 'if', 'in', 'is', 'new', 'null', 'rethrow', 'return', 'super', 'switch', 'this', 'throw', 'true', 'try', 'var', 'void', 'while', 'with'],
+        elixir: ['true', 'false', 'nil', 'when', 'and', 'or', 'not', 'in', 'fn', 'do', 'end', 'catch', 'rescue', 'after', 'else'],
+        erlang: ['after', 'and', 'andalso', 'band', 'begin', 'bnot', 'bor', 'bsl', 'bsr', 'bxor', 'case', 'catch', 'cond', 'div', 'end', 'fun', 'if', 'let', 'not', 'of', 'or', 'orelse', 'query', 'receive', 'rem', 'try', 'when', 'xor'],
+        fsharp: ['abstract', 'and', 'as', 'assert', 'base', 'begin', 'class', 'default', 'delegate', 'do', 'done', 'downcast', 'downto', 'elif', 'else', 'end', 'exception', 'extern', 'false', 'finally', 'for', 'fun', 'function', 'global', 'if', 'in', 'inherit', 'inline', 'interface', 'internal', 'lazy', 'let', 'match', 'member', 'module', 'mutable', 'namespace', 'new', 'null', 'of', 'open', 'or', 'override', 'private', 'public', 'rec', 'return', 'return!', 'select', 'static', 'struct', 'then', 'to', 'true', 'try', 'type', 'upcast', 'use', 'use!', 'val', 'void', 'when', 'while', 'with', 'yield'],
+        fortran: ['abstract', 'allocatable', 'allocate', 'assign', 'associate', 'asynchronous', 'backspace', 'bind', 'block', 'block', 'data', 'call', 	'case','class', 'close', 'codimension', 'common', 'contains', 'contiguous', 'continue', 'critical', 'cycle', 'data', 'deallocate', 'deferred', 'dimension', 'do', 'do', 'concurrent', 	'elemental','else', 'else', 'if', 'elsewhere', 	'end', 'endfile', 'endif', 'entry', 'enum', 'enumerator', 'equivalence', 'error', 'stop', 'exit', 'extends', 'external', 'final', 'flush', 'forall', 'format', 'function', 'generic', 'goto', 'if', 'implicit', 'import', 'include', 'inquire', 'intent', 'interface', 'intrinsic', 'lock', 'module', 'namelist', 'non_overridable', 'nopass', 'nullify', 'only', 'open', 'operator', 'optional', 'parameter', 'pass', 'pause', 'pointer', 'print', 'private', 'procedure', 'program', 'protected', 'public', 'pure', 'read', 'recursive', 'result', 'return', 'rewind', 'rewrite', 'save', 'select', 'sequence', 'stop', 'submodule', 'subroutine', 'sync', 'all', 'images','sync', 'memory', 'target', 'then', 	'unlock','use', 'value', 'volatile', 'wait', 'where', 'while', 'write'],
+        go: ['break', 'case', 'chan', 'const', 'continue', 'default', 'defer', 'else', 'fallthrough', 'for', 'func', 'go', 'goto', 'if', 'import', 'interface', 'map', 'package', 'range', 'return', 'select', 'struct', 'switch', 'type', 'var'],
+        haskell: ['as', 'case', 'class', 'data', 'default', 'deriving', 'do', 'else', 'hiding', 'if', 'import', 'in', 'infix', 'infixl', 'infixr', 'instance', 'let', 'module', 'newtype', 'of', 'qualified', 'then', 'type', 'where'],
+        java: ['abstract', 'assert', 'boolean', 'break', 'byte', 'case', 'catch', 'char', 'class', 'continue', 'default', 'do', 'double', 'else', 'enum', 'extends', 'final', 'finally', 'float', 'for', 'if', 'implements', 'import', 'instanceof', 'int', 'interface', 'long', 'native', 'new', 'package', 'private', 'protected', 'public', 'return', 'short', 'static', 'strictfp', 'super', 'switch', 'synchronized', 'this', 'throw', 'throws', 'transient', 'try', 'void', 'volatile', 'while'],
+        javascript: ['break', 'case', 'catch', 'class', 'const', 'continue', 'debugger', 'default', 'delete', 'do', 'else', 'enum', 'export', 'extends', 'false', 'finally', 'for', 'function', 'if', 'implements', 'import', 'in', 'instanceof', 'interface', 'let', 'new', 'null', 'package', 'private', 'protected', 'public', 'return', 'static', 'super', 'switch', 'this', 'throw', 'true', 'try', 'typeof', 'var', 'void', 'while', 'with', 'yield'],
+        julia: ['abstract', 'baremodule', 'begin', 'break', 'catch', 'const', 'continue', 'do', 'else', 'elseif', 'end', 'export', 'false', 'finally', 'for', 'function', 'global', 'if', 'import', 'let', 'local', 'macro', 'module', 'quote', 'return', 'struct', 'true', 'try', 'using', 'while'],
+        kotlin: ['as', 'as?', 'break', 'class', 'continue', 'do', 'else', 'false', 'for', 'fun', 'if', 'in', '!in', 'interface', 'is', '!is', 'null', 'object', 'package', 'return', 'super', 'this', 'throw', 'true', 'try', 'typealias', 'val', 'var', 'when', 'while'],
+        lua: ['and', 'break', 'do', 'else', 'elseif', 'end', 'false', 'for', 'function', 'goto', 'if', 'in', 'local', 'nil', 'not', 'or', 'repeat', 'return', 'then', 'true', 'until', 'while'],
+        matlab: ['break', 'case', 'catch', 'classdef', 'continue', 'else', 'elseif', 'end', 'for', 'function', 'global', 'if', 'otherwise', 'parfor', 'persistent', 'return', 'spmd', 'switch', 'try', 'while'],
+        objectivec: ['auto', 'break', 'case', 'char', 'const', 'continue', 'default', 'do', 'double', 'else', 'enum', 'extern', 'float', 'for', 'goto', 'if', 'inline', 'int', 'long', 'register', 'restrict', 'return', 'short', 'signed', 'sizeof', 'static', 'struct', 'switch', 'typedef', 'union', 'unsigned', 'void', 'volatile', 'while', '_Alignas', '_Alignof', '_Atomic', '_Bool', '_Complex', '_Generic', '_Imaginary', '_Noreturn', '_Static_assert', '_Thread_local'],
+        ocaml: ['and', 'as', 'assert', 'asr', 'begin', 'class', 'constraint', 'do', 'done', 'downto', 'else', 'end', 'exception', 'external', 'false', 'for', 'fun', 'function', 'functor', 'if', 'in', 'include', 'inherit', 'initializer', 'land', 'lazy', 'let', 'lor', 'lsl', 'lsr', 'lxor', 'match', 'method', 'mod', 'module', 'mutable', 'new', 'nonrec', 'object', 'of', 'open', 'or', 'private', 'rec', 'sig', 'struct', 'then', 'to', 'true', 'try', 'type', 'val', 'virtual', 'when', 'while', 'with'],
+        perl: ['__DATA__', '__END__', '__FILE__', '__LINE__', '__PACKAGE__', 'and', 'cmp', 'continue', 'CORE', 'do', 'else', 'elsif', 'eq', 'eval', 'for', 'foreach', 'ge', 'gt', 'if', 'INIT', 'le', 'lt', 'm', 'my', 'ne', 'no', 'or', 'package', 'q', 'qq', 'qr', 'qw', 'qx', 's', 'sub', 'tr', 'unless', 'until', 'use', 'while', 'xor', 'y'],
+        php: ['__halt_compiler', 'abstract', 'and', 'array', 'as', 'break', 'callable', 'case', 'catch', 'class', 'clone', 'const', 'continue', 'declare', 'default', 'die', 'do', 'echo', 'else', 'elseif', 'empty', 'enddeclare', 'endfor', 'endforeach', 'endif', 'endswitch', 'endwhile', 'eval', 'exit', 'extends', 'final', 'finally', 'fn', 'for', 'foreach', 'function', 'global', 'goto', 'if', 'implements', 'include', 'include_once', 'instanceof', 'insteadof', 'interface', 'isset', 'list', 'match', 'namespace', 'new', 'or', 'print', 'private', 'protected', 'public', 'require', 'require_once', 'return', 'static', 'switch', 'throw', 'trait', 'try', 'unset', 'use', 'var', 'while', 'xor', 'yield', 'yield from'],
+        python: ['False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield'],
+        r: ['break', 'else', 'for', 'function', 'if', 'in', 'next', 'repeat', 'return', 'switch', 'while'],
+        ruby: ['__ENCODING__', '__END__', '__FILE__', '__LINE__', '__dir__', '__method__', '__private__', '__protected__', '__public__', 'BEGIN', 'END', 'alias', 'and', 'begin', 'break', 'case', 'class', 'def', 'defined?', 'do', 'else', 'elsif', 'end', 'ensure', 'false', 'for', 'if', 'in', 'module', 'next', 'nil', 'not', 'or', 'redo', 'rescue', 'retry', 'return', 'self', 'super', 'then', 'true', 'undef', 'unless', 'until', 'when', 'while', 'yield'],
+        rust: ['as', 'break', 'const', 'continue', 'crate', 'else', 'enum', 'extern', 'false', 'fn', 'for', 'if', 'impl', 'in', 'let', 'loop', 'match', 'mod', 'move', 'mut', 'pub', 'ref', 'return', 'self', 'Self', 'static', 'struct', 'super', 'trait', 'true', 'type', 'unsafe', 'use', 'where', 'while'],
+        scala: ['abstract', 'case', 'catch', 'class', 'def', 'do', 'else', 'extends', 'false', 'final', 'finally', 'for', 'forSome', 'if', 'implicit', 'import', 'lazy', 'match', 'new', 'null', 'object', 'override', 'package', 'private', 'protected', 'return', 'sealed', 'super', 'this', 'throw', 'trait', 'try', 'true', 'type', 'val', 'var', 'while', 'with', 'yield'],
+        swift: ['Any', 'AnyObject', 'as', 'associativity', 'break', 'case', 'catch', 'class', 'continue', 'convenience', 'default', 'deinit', 'didSet', 'do', 'dynamicType', 'else', 'enum', 'extension', 'fallthrough', 'false', 'final', 'for', 'func', 'get', 'guard', 'if', 'import', 'in', 'infix', 'init', 'inout', 'internal', 'is', 'lazy', 'left', 'let', 'mutating', 'nil', 'none', 'nonmutating', 'operator', 'optional', 'override', 'postfix', 'precedence', 'prefix', 'private', 'protocol', 'Protocol', 'public', 'repeat', 'required', 'return', 'right', 'self', 'Self', 'set', 'static', 'struct', 'subscript', 'super', 'switch', 'throw', 'throws', 'true', 'try', 'Type', 'typealias', 'unowned', 'var', 'weak', 'where', 'while', 'willSet'],
+        typescript: ['abstract', 'any', 'as', 'break', 'case', 'catch', 'class', 'continue', 'const', 'constructor', 'debugger', 'declare', 'default', 'delete', 'do', 'else', 'enum', 'export', 'extends', 'false', 'finally', 'for', 'from', 'function', 'get', 'if', 'implements', 'import', 'in', 'infer', 'instanceof', 'interface', 'is', 'keyof', 'let', 'module', 'namespace', 'never', 'new', 'null', 'number', 'of', 'package', 'private', 'protected', 'public', 'readonly', 'require', 'global', 'return', 'set', 'static', 'string', 'super', 'switch', 'symbol', 'this', 'throw', 'true', 'try', 'type', 'typeof', 'unique', 'unknown', 'var', 'void', 'while', 'with', 'yield'],
+        visualbasic: ['AddHandler', 'AddressOf', 'Alias', 'And', 'AndAlso', 'As', 'Boolean', 'ByRef', 'Byte', 'ByVal', 'Call', 'Case', 'Catch', 'CBool', 'CByte', 'CChar', 'CDate', 'CDbl', 'CDec', 'Char', 'CInt', 'Class', 'CLng', 'CObj', 'Const', 'Continue', 'CSByte', 'CShort', 'CSng', 'CStr', 'CType', 'CUInt', 'CULng', 'CUShort', 'Date', 'Decimal', 'Declare', 'Default', 'Delegate', 'Dim', 'DirectCast', 'Do', 'Double', 'Each', 'Else', 'ElseIf', 'End', 'EndIf', 'Enum', 'Erase', 'Error', 'Event', 'Exit', 'False', 'Finally', 'For', 'Friend', 'Function', 'Get', 'GetType', 'GetXMLNamespace', 'Global', 'GoSub', 'GoTo', 'Handles', 'If', 'Implements', 'Imports', 'In', 'Inherits', 'Integer', 'Interface', 'Is', 'IsNot', 'Let', 'Lib', 'Like', 'Long', 'Loop', 'Me', 'Mod', 'Module', 'MustInherit', 'MustOverride', 'MyBase', 'MyClass', 'Namespace', 'Narrowing', 'New', 'Next', 'Not', 'Nothing', 'NotInheritable', 'NotOverridable', 'Object', 'Of', 'On', 'Operator', 'Option', 'Optional', 'Or', 'OrElse', 'Out', 'Overloads', 'Overridable', 'Overrides', 'ParamArray', 'Partial', 'Private', 'Property', 'Protected', 'Public', 'RaiseEvent', 'ReadOnly',
+        'ReDim', 'REM', 'RemoveHandler', 'Resume', 'Return', 'SByte', 'Select', 'Set', 'Shadows', 'Shared', 'Short', 'Single', 'Static', 'Step', 'Stop', 'String', 'Structure', 'Sub', 'SyncLock', 'Then', 'Throw', 'To', 'True', 'Try', 'TryCast', 'TypeOf', 'UInteger', 'ULong', 'UShort', 'Using', 'Variant', 'Wend', 'When', 'While', 'Widening', 'With', 'WithEvents', 'WriteOnly', 'Xor'],
+        zig: ['align', 'allowzero', 'and', 'anyframe', 'anytype', 'asm', 'async', 'await', 'break', 'catch', 'comptime', 'const', 'continue', 'defer', 'else', 'enum', 'errdefer', 'error', 'export', 'extern', 'false', 'fn', 'for', 'if', 'inline', 'linksection', 'noalias', 'nakedcc', 'null', 'or', 'orelse', 'packed', 'pub', 'resume', 'return', 'struct', 'suspend', 'switch', 'test', 'threadlocal', 'true', 'try', 'undefined', 'union', 'unreachable', 'usingnamespace', 'var', 'volatile', 'while', 'with'],
+      };
 
-    <pre>
-        Some, punctuation! #a and &b.
-    </pre>
-</body>
+      function colorChars(text) {
+        var newText = text
+          .replace(
+            /(?![^<]+>)([.,\/!$+&;<\[\]>%\^\*:{}=\-_`~()])/g,
+            '<span class=\'pre-punctuation\'>$1</span>'
+          )
+          .replace(/(?![^<]+>)([0-9])/g, '<span class=\'pre-number\'>$1</span>')
+          .replace(/(?![^<]+>)(["'])(?:(?=(\\?))\2.)*?\1/g, "<span class='pre-string'>$&</span>");
+          return newText;
+        }
+        
+        function colorLanguage(lang) {
+          $(document).ready(function () {
+            var text = $('.'+lang).text();
+            var keywordRegex = new RegExp('(?![^<]+>)\\b('+ KEYWORDS[lang].join('|') + ')\\b', 'g');
+            var newText = colorChars(text)
+            .replace(
+              keywordRegex,
+              '<span class=\'pre-keyword\'>$1</span>'
+              );
+          $('.'+lang).html(newText);
+        });
+      }
+
+      colorLanguage('ocaml');
+      colorLanguage('c');
+
+      // for (const [name, keywords] of Object.entries(KEYWORDS)) {
+      //   colorLanguage(name, keywords);
+      // }
+    </script>
+  </head>
+  <body>
+    <pre class="pre-block ocaml">
+let rec fib n =
+  if n < 2 then [n] "Hello World" !
+  else fib (n - 1.3) + fib (n - 2);;
+</pre>
+
+<pre class="pre-block c">
+  define 
+  defined 
+  ifndef
+  ifdef 
+#include &lt;iostream&gt;
+int main(char** argv){
+    printf("Hello World");
+    return 0;
+}
+</pre>
+
+  </body>
 </html>

@@ -7,12 +7,12 @@
 
 void writeTagsChar(
     std::ofstream* output, char current,
-    ReadingState* readState) {  // FIXME: never exists tab writing mode
+    ReadingState* readState) {
     std::cout << "T; ";
     switch (current) {
         case '>':
             if (!readState->tagState->readingTagName) {
-                *output << current;
+                *output << "&gt;";
             } else {
                 *output << "<";
                 if (readState->tagState->closeTag) {
