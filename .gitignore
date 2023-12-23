@@ -7,3 +7,5 @@ try
 # tests
 # run
 .*
+try/
+try/*
