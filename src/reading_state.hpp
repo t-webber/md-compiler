@@ -3,6 +3,8 @@
 #include <iostream>
 #include <list>
 #include <string>
+#include <optional>
+
 
 struct TagState {
   std::string tag;
@@ -31,6 +33,8 @@ struct ReadingState {
   bool italic;
   std::string lang;
   TagState* tagState;
+  std::optional<bool> newline;
+  std::optional<bool> lastNewline;
 };
 typedef ReadingState ReadingState;
 

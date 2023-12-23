@@ -1,6 +1,6 @@
 # Formation Humaine
 
-## De la science technique
+### De la science technique
 
 ```OCaml
 let rec f = function
@@ -20,12 +20,34 @@ a
 
 Let's cite an author.
 > Every man dies, 
+> 
 > not every man really lives.
 
+```Cpp
+#include <iostream>
+int main(char** argv){
+// std::cout << "Hello, World!" >> std::endl;
+  return 0;
+}
+```
+```Rust
+fn main (
+  void buffer println!
+)
+```
 
+Lorem Ipsum
+DOlor Sit Amet
+
+Quam Rescurgat
+
+
+Im Pace deblief
 
 <style>
-  >  **hello**
+ body {
+  background: green;
+ }
 </style>
 
 Lor*emi**psumdol*orsita**mtquameresu*rgatde*ispuelscat

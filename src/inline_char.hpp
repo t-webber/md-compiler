@@ -6,9 +6,9 @@
 #include <iostream>
 #include <string>
 
-std::string readLanguage(std::ifstream* input, ReadingState* readState);
+std::string readLanguage(std::ifstream* input, ReadingState* readState, char* current);
 
-void checkVerbatim(std::ofstream* output, std::ifstream* input, ReadingState* readState, bool is_accent);
+void checkVerbatim(std::ofstream* output, std::ifstream* input, ReadingState* readState, char* current);
 
 void writeVerbatimChar(std::ofstream* output, char current,
                        ReadingState* readState);

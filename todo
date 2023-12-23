@@ -1,3 +1,4 @@
-//TODO: Synthaxic coloration
+//FIXME: When a star is written, we want it to appear as a star.
 
-//FIXME: Ignore html tags
+//BUG: If written ##*# on start of line, h3 is created instead of h2.
+

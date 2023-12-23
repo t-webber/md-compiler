@@ -45,21 +45,19 @@ void readNChange(std::ifstream* input, std::ofstream* output) {
   TagState tagState;
   initState(&readState, &tagState);
 
-  bool current_is_accent;
-
   while ((*input).good()) {
     char current = (*input).get();
     if (current == EOF) {
       break;
     }
 
-    current_is_accent = (current == '`');
-    checkVerbatim(output, input, &readState, current_is_accent);
+    checkVerbatim(output, input, &readState, &current);
     writeCharOutput(output, current, &readState);
   }
  
+  char z = ' ';
+  checkVerbatim(output, input, &readState, &z);
   writeCharOutput(output, ' ', &readState);
-  checkVerbatim(output, input, &readState, false);
   endBlocQuote(output, &readState);
   endUl(output, &readState);
   endOl(output, &readState);
@@ -69,16 +67,11 @@ void readNChange(std::ifstream* input, std::ofstream* output) {
 
 void writeCharOutput(std::ofstream* output, char current,
                      ReadingState* readState) {
-  std::cout << "C = " << current << "; ";
+  // std::cout << "C= " << current << "\t; ";
   printState(readState);
-  if (current == '<' || readState->tagState->openedTags.size() > 0 || readState->tagState->readingTagName) {
-    writeTagsChar(output, current, readState);
-  } else if (readState->verbatim) {
-    writeVerbatimChar(output, current, readState);
-  } else if (readState->lineChange) {
-    writeNewlineChar(output, current, readState);
-  } else {
-    writeDefaultChar(output, current, readState);
-  }
-  std::cout << "endl" << std::endl;
+  if (readState->verbatim) writeVerbatimChar(output, current, readState);
+  else if (current == '<' || readState->tagState->openedTags.size() > 0 || readState->tagState->readingTagName) writeTagsChar(output, current, readState);
+  else if (readState->lineChange) writeNewlineChar(output, current, readState);
+  else writeDefaultChar(output, current, readState);
+  // std::cout << "endl" << std::endl;
 }

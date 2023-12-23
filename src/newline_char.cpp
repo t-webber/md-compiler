@@ -12,6 +12,7 @@ void endOfSuccessive(std::ofstream* output, ReadingState* readState,
         readState->header = readState->sharp;
         readState->sharp = 0;
         readState->lineChange = false;
+        readState->newline = readState->newline.value_or(false);
     }
 }
 
@@ -19,7 +20,7 @@ void endBlocQuote(std::ofstream* output, ReadingState* readState) {
     if (readState->blockquote) {
         *output << "</div>" << std::endl;
         readState->blockquote = false;
-        
+        readState->newline = readState->newline.value_or(false);
     }
 }
 
@@ -27,35 +28,35 @@ void endUl(std::ofstream* output, ReadingState* readState) {
     if (readState->itemize) {
         *output << "</li>" << std::endl << "</ul>" << std::endl;
         readState->itemize--;
-        
+        readState->newline = readState->newline.value_or(false);
     }
 }
 
 void endOl(std::ofstream* output, ReadingState* readState) {
-    if (readState->last_nb != '!') {
+    if (readState->last_nb != 'z') {
         readState->lineChange = false;
-        
+        readState->newline = readState->newline.value_or(false);
         writeDefaultChar(output, readState->last_nb, readState);
-        readState->last_nb = '!';
+        readState->last_nb = 'z';
     }
     if (readState->enumerate) {
-        std::cout << "closing...";
+        // std::cout << "closing...";
         *output << "</li>" << std::endl << "</ol>" << std::endl;
         readState->enumerate--;
-        
+        readState->newline = readState->newline.value_or(false);
     }
 }
 
 void writeNewlineChar(std::ofstream* output, char current,
                       ReadingState* readState) {
-    std::cout << "N with " << current << "><; ";
+    // std::cout << "N; ";
     switch (current) {
         case '`':
-            std::cout << "increment accent";
+            // std::cout << "increment accent";
             endUl(output, readState);
             endOl(output, readState);
             endBlocQuote(output, readState);
-            
+            readState->newline = readState->newline.value_or(false);
             readState->accent++;
             break;
         case '>':
@@ -67,13 +68,14 @@ void writeNewlineChar(std::ofstream* output, char current,
             }
             readState->blockquote = true;
             readState->lineChange = false;
+            readState->newline = readState->newline.value_or(false);
             break;
         case '.':
             endUl(output, readState);
             endBlocQuote(output, readState);
-            if (readState->last_nb != '!') {
-                readState->last_nb = '!';
-                std::cout << "found OL ";
+            if (readState->last_nb != 'z') {
+                readState->last_nb = 'z';
+                // std::cout << "found OL ";
                 if (readState->enumerate) {
                     *output << "</li>" << std::endl << "\t<li>";
                 } else {
@@ -81,11 +83,11 @@ void writeNewlineChar(std::ofstream* output, char current,
                     readState->enumerate++;
                 }
                 readState->lineChange = false;
-                
+                readState->newline = readState->newline.value_or(false);
                 break;
             }
         case '-':
-            std::cout << "found li; ";
+            // std::cout << "found li; ";
             endOl(output, readState);
             endBlocQuote(output, readState);
             if (!readState->itemize) {
@@ -95,38 +97,50 @@ void writeNewlineChar(std::ofstream* output, char current,
                 *output << "</li>" << std::endl << "\t<li>";
             }
             readState->lineChange = false;
-            
+            readState->newline = readState->newline.value_or(false);
             break;
         case '#':
             endUl(output, readState);
             endOl(output, readState);
             endBlocQuote(output, readState);
-            
             readState->sharp++;
+            readState->newline = readState->newline.value_or(false);
             break;
         case ' ':
             readState->spaces++;
-            
             break;
         case '\n':
             // std::cout << "found newline !!!!!!!!!!!!!!!!!!!!";
-            *output << "<br>";
+            if (readState->lastNewline.has_value() && readState->lastNewline.value()) {
+                *output << "<br>";
+            }
+            if (readState->lastNewline.has_value()) {
+          // std::cout << "newline with N = " << readState->lastNewline.value() << " ! ";
+            } else {
+          // std::cout << "newline with N = empty ! ";
+            }
+
             readState->spaces = 0;
             readState->sharp = 0;
+            readState->lastNewline = readState->newline;
+            readState->newline = {};
             break;
         default:
             if (int(current) == 13) {
-                std::cout << "wrong newline" << std::endl;
+              // std::cout << "wrong newline" << std::endl;
                 writeNewlineChar(output, '\n', readState);
+                readState->newline = readState->newline.value_or(false);
             }
             endOfSuccessive(output, readState, current);
             if (is_number(current)) {
                 readState->last_nb = current;
+                readState->newline = readState->newline.value_or(false);
             } else {
                 endOl(output, readState);
                 endUl(output, readState);
                 endBlocQuote(output, readState);
                 readState->lineChange = false;
+                readState->newline = readState->newline.value_or(true);
                 writeDefaultChar(output, current, readState);
             }
             break;

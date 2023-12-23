@@ -8,7 +8,7 @@
 void writeTagsChar(
     std::ofstream* output, char current,
     ReadingState* readState) {
-    std::cout << "T; ";
+  // std::cout << "T; ";
     switch (current) {
         case '>':
             if (!readState->tagState->readingTagName) {

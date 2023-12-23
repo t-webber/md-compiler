@@ -6,22 +6,25 @@
 
 #include "reading_state.hpp"
 
-std::string readLanguage(std::ifstream* input, ReadingState* readState){
+std::string readLanguage(std::ifstream* input, ReadingState* readState, char* current){
     std::string lang = "";
-    char current = (*input).get();
-    while (current != '\n' && int(current) != 13 && current != EOF) {
-        lang += current;
-        current = (*input).get();
+    while (*current != '\n' && int(*current) != 13 && *current != EOF) {
+        lang += *current;
+        *current = (*input).get();
     };
-    if (current == EOF) {
+    if (*current == EOF) {
         std::cerr << "Error: no newline after language declaration" << std::endl;
         exit(4);
     };
+    for(int i = 0; i < lang.length(); i++){
+        lang[i] = tolower(lang[i]);
+    }
     return lang;
 }
 
 void checkVerbatim(std::ofstream *output, std::ifstream* input, ReadingState *readState,
-                   bool is_accent) {
+                   char* current) {
+    bool is_accent = (*current == '`');
     if (!readState->accent || is_accent) {
         return;
     }
@@ -42,8 +45,10 @@ void checkVerbatim(std::ofstream *output, std::ifstream* input, ReadingState *re
         if (readState->verbatim) {
             *output << "</pre>";
         } else {
-            std::string lang = readLanguage(input, readState);
-            *output << "<pre class='pre-block " << lang << "'>" << std::endl;
+            std::string lang = readLanguage(input, readState, current);
+            // std::cout << "lang : " << lang << std::endl;
+            *output << "<script>colourLanguage('" << lang << "')</script>" << std::endl;
+            *output << "<pre class='pre-block " << lang << "'>"; 
         }
         readState->verbatim = !readState->verbatim;
         readState->accent = 0;
@@ -52,7 +57,7 @@ void checkVerbatim(std::ofstream *output, std::ifstream* input, ReadingState *re
 
 void writeVerbatimChar(std::ofstream *output, char current,
                        ReadingState *readState) {
-    std::cout << "V; ";
+    // std::cout << "V; ";
     switch (current) {
         case '`':
             readState->accent += 1;
@@ -62,10 +67,19 @@ void writeVerbatimChar(std::ofstream *output, char current,
             *output << ' ';
             readState->accent = 0;
             break;
+        case '>':
+            *output << "&gt;";
+            break;
+        case '<':
+            *output << "&lt;";
+            break;
         default:
             *output << current;
     }
 }
+
+
+
 
 void endStar(std::ofstream *output, ReadingState *readState) {
     if (readState->star && readState->italic) {
@@ -80,7 +94,7 @@ void endStar(std::ofstream *output, ReadingState *readState) {
 
 void writeDefaultChar(std::ofstream *output, char current,
                       ReadingState *readState) {
-    std::cout << "D; ";
+    // std::cout << "D; ";
     if (current != '*') {
         endStar(output, readState);
     }
@@ -97,7 +111,17 @@ void writeDefaultChar(std::ofstream *output, char current,
                 *output << ">" << std::endl;
                 readState->header = 0;
             }
+            // if (readState->lastNewline.has_value() && readState->lastNewline.value()) {
+            //     *output << "<boor>";
+            // }
+            if (readState->lastNewline.has_value()) {
+            // std::cout << "newline with N = " << readState->lastNewline.value() << " ! ";
+            } else {
+            // std::cout << "newline with N = empty ! ";
+            }
             readState->lineChange = true;
+            readState->lastNewline = readState->newline;
+            readState->newline = {};
             readState->spaces = 0;
 
             break;
@@ -111,7 +135,7 @@ void writeDefaultChar(std::ofstream *output, char current,
             }
             break;
         case '*':
-            std::cout << "found star ";
+            // std::cout << "found star ";
             if (readState->star && readState->bold) {
                 *output << "</b>";
                 readState->bold = false;
@@ -121,9 +145,9 @@ void writeDefaultChar(std::ofstream *output, char current,
                 readState->bold = true;
                 readState->star = false;
             } else {
-                std::cout << "first star ";
+                // std::cout << "first star ";
                 readState->star = true;
-                std::cout << readState->star;
+                // std::cout << readState->star;
             };
             break;
         default:
