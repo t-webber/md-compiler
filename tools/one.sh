@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-clear
+# clear
 xmake
 if [[ -z $1 ]]
 then

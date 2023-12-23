@@ -52,10 +52,10 @@ void copyFile(std::ofstream* output, std::string path){
 }
 
 void addInit(std::ofstream* output) {
-  copyFile(output, "./src/html_templates/header.html");
+  copyFile(output, "./lib/header.html");
 }
 
 
 void addEnd(std::ofstream* output) {
-  copyFile(output, "./src/html_templates/footer.html");
+  copyFile(output, "./lib/footer.html");
 }
