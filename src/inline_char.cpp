@@ -18,6 +18,9 @@ std::string readLanguage(std::ifstream* input, ReadingState* readState, char* cu
     };
     for(int i = 0; i < lang.length(); i++){
         lang[i] = tolower(lang[i]);
+        if (lang[i] == '+') {
+            lang[i] = 'p';
+        }
     }
     return lang;
 }
