@@ -1,5 +1,0 @@
-//FIXME: When a star is written, we want it to appear as a star.
-
-//BUG: If written ##*# on start of line, h3 is created instead of h2.
-
-//ADD: Different names for the same language (e.g. javascript, js, nodejs, node.js, node)
