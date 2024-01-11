@@ -1,6 +1,5 @@
 build/
-try/
 .vcode
 .xmake
-todo
 test/
+todo.todo

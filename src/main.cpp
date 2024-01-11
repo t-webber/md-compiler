@@ -4,7 +4,7 @@
 #include "format.hpp"
 #include "tags_char.hpp"
 
-
+#include <cctype>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -61,6 +61,7 @@ void readNChange(std::ifstream* input, std::ofstream* output) {
   endBlocQuote(output, &readState);
   endUl(output, &readState);
   endOl(output, &readState);
+
   addEnd(output);
 }
 

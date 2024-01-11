@@ -42,6 +42,5 @@ void printState(ReadingState* state);
 
 void initState(ReadingState* state, TagState* tag);
 
-bool is_number(char c);
 
 #endif

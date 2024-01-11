@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <cctype>
 
 #include "inline_char.hpp"
 #include "reading_state.hpp"
@@ -52,6 +53,7 @@ void writeNewlineChar(std::ofstream* output, char current,
     // std::cout << "N; ";
     switch (current) {
         case '`':
+            endOfSuccessive(output, readState, current);
             // std::cout << "increment accent";
             endUl(output, readState);
             endOl(output, readState);
@@ -60,6 +62,7 @@ void writeNewlineChar(std::ofstream* output, char current,
             readState->accent++;
             break;
         case '>':
+            endOfSuccessive(output, readState, current);
             endUl(output, readState);
             endOl(output, readState);
             *output << std::endl;
@@ -70,23 +73,8 @@ void writeNewlineChar(std::ofstream* output, char current,
             readState->lineChange = false;
             readState->newline = readState->newline.value_or(false);
             break;
-        case '.':
-            endUl(output, readState);
-            endBlocQuote(output, readState);
-            if (readState->last_nb != 'z') {
-                readState->last_nb = 'z';
-                // std::cout << "found OL ";
-                if (readState->enumerate) {
-                    *output << "</li>" << std::endl << "\t<li>";
-                } else {
-                    *output << "<ol>" << std::endl << "\t<li>";
-                    readState->enumerate++;
-                }
-                readState->lineChange = false;
-                readState->newline = readState->newline.value_or(false);
-                break;
-            }
         case '-':
+            endOfSuccessive(output, readState, current);
             // std::cout << "found li; ";
             endOl(output, readState);
             endBlocQuote(output, readState);
@@ -111,34 +99,50 @@ void writeNewlineChar(std::ofstream* output, char current,
             break;
         case '\n':
             // std::cout << "found newline !!!!!!!!!!!!!!!!!!!!";
-            if (readState->lastNewline.has_value() && readState->lastNewline.value()) {
+            if (readState->lastNewline.has_value() &&
+                readState->lastNewline.value()) {
                 *output << "<br>";
-            }
-            if (readState->lastNewline.has_value()) {
-          // std::cout << "newline with N = " << readState->lastNewline.value() << " ! ";
+            } if (readState->lastNewline.has_value()) {
+                // std::cout << "newline with N = " <<
+                // readState->lastNewline.value() << " ! ";
             } else {
-          // std::cout << "newline with N = empty ! ";
+                // std::cout << "newline with N = empty ! ";
             }
 
             readState->spaces = 0;
-            readState->sharp = 0;
-            readState->lastNewline = readState->newline;
+            readState->sharp = 0; readState->lastNewline = readState->newline;
             readState->newline = {};
             break;
         default:
             if (int(current) == 13) {
-              // std::cout << "wrong newline" << std::endl;
+                // std::cout << "wrong newline" << std::endl;
                 writeNewlineChar(output, '\n', readState);
                 readState->newline = readState->newline.value_or(false);
+                break;
             }
             endOfSuccessive(output, readState, current);
-            if (is_number(current)) {
+            if (std::isdigit(current)) {
                 readState->last_nb = current;
                 readState->newline = readState->newline.value_or(false);
-            } else {
-                endOl(output, readState);
+                break;
+            }
                 endUl(output, readState);
                 endBlocQuote(output, readState);
+            if (!std::isalnum(current)) {
+                if (readState->last_nb != 'z') {
+                readState->last_nb = 'z';
+                // std::cout << "found OL ";
+                if (readState->enumerate) {
+                    *output << "</li>" << std::endl << "\t<li>";
+                } else {
+                    *output << "<ol>" << std::endl << "\t<li>";
+                    readState->enumerate++;
+                }
+                readState->lineChange = false;
+                readState->newline = readState->newline.value_or(false);
+                break;
+            }
+                endOl(output, readState);
                 readState->lineChange = false;
                 readState->newline = readState->newline.value_or(true);
                 writeDefaultChar(output, current, readState);

@@ -2,6 +2,7 @@
 
 #include "inline_char.hpp"
 #include "reading_state.hpp"
+#include <cctype>
 
 
 #include <fstream>
